@@ -1,0 +1,79 @@
+@model DesafioBackend.Web.Models.Entregadores.CadastrarEntregadorViewModel
+@{
+    ViewData["Title"] = "Cadastrar Entregador";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h1 class="h4 mb-0">Cadastrar Novo Entregador</h1>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Cadastrar" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Identificador" class="form-label fw-bold"></label>
+                            <input asp-for="Identificador" class="form-control" placeholder="Ex: driver01" />
+                            <span asp-validation-for="Identificador" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Nome" class="form-label fw-bold"></label>
+                            <input asp-for="Nome" class="form-control" placeholder="Nome Completo" />
+                            <span asp-validation-for="Nome" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Cnpj" class="form-label fw-bold"></label>
+                            <input asp-for="Cnpj" class="form-control" placeholder="Apenas números ou formatado" />
+                            <span asp-validation-for="Cnpj" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DataNascimento" class="form-label fw-bold"></label>
+                            <input asp-for="DataNascimento" class="form-control" type="date" />
+                            <span asp-validation-for="DataNascimento" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="NumeroCnh" class="form-label fw-bold"></label>
+                            <input asp-for="NumeroCnh" class="form-control" placeholder="Número único da CNH" />
+                            <span asp-validation-for="NumeroCnh" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="TipoCnh" class="form-label fw-bold"></label>
+                            <select asp-for="TipoCnh" class="form-select">
+                                <option value="A">Categoria A (Habilitado para Moto)</option>
+                                <option value="B">Categoria B (Apenas Carro)</option>
+                                <option value="AB">Categoria A+B (Moto e Carro)</option>
+                            </select>
+                            <span asp-validation-for="TipoCnh" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="FotoCnh" class="form-label fw-bold"></label>
+                        <input asp-for="FotoCnh" class="form-control" type="file" accept=".png,.bmp" />
+                        <span asp-validation-for="FotoCnh" class="text-danger small"></span>
+                        <div class="form-text">Formatos permitidos: <strong>.PNG</strong> ou <strong>.BMP</strong>. A foto é convertida e gravada em storage dedicado.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-4">Salvar Entregador</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

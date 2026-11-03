@@ -1,0 +1,119 @@
+@model IReadOnlyList<DesafioBackend.Web.Models.Locacoes.LocacaoViewModel>
+@{
+    ViewData["Title"] = "Locações";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Locações</h1>
+        <p class="text-muted mb-0">Controle o aluguel de motos, devoluções e tarifas.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">
+            &larr; Voltar ao Painel
+        </a>
+        <a asp-action="Nova" class="btn btn-primary">
+            + Nova Locação
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Identificador</th>
+                    <th>Entregador</th>
+                    <th>Moto</th>
+                    <th>Diária</th>
+                    <th>Data Início</th>
+                    <th>Previsão Término</th>
+                    <th>Devolução</th>
+                    <th>Tarifa Total</th>
+                    <th>Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            Nenhuma locação registrada.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var loc in Model)
+                    {
+                        <tr>
+                            <td><strong>@loc.Identificador</strong></td>
+                            <td><code>@loc.EntregadorId</code></td>
+                            <td><code>@loc.MotoId</code></td>
+                            <td>@loc.ValorDiaria.ToString("C2")</td>
+                            <td>@loc.DataInicio.ToString("dd/MM/yyyy")</td>
+                            <td>@loc.DataPrevisaoTermino.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @(loc.DataDevolucao.HasValue ? loc.DataDevolucao.Value.ToString("dd/MM/yyyy") : "-")
+                            </td>
+                            <td>
+                                @if (loc.IsActive)
+                                {
+                                    <span class="text-muted small">Previsto:</span>
+                                    <span class="fw-semibold">@loc.ValorTotal.ToString("C2")</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success fw-bold">
+                                        @loc.ValorTotal.ToString("C2")
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (loc.IsActive)
+                                {
+                                    <span class="badge bg-success">Ativa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Devolvida</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (loc.IsActive)
+                                {
+                                    <a asp-action="Devolver" asp-route-id="@loc.Identificador" class="btn btn-sm btn-outline-warning">
+                                        Informar Devolução
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Finalizada</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

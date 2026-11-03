@@ -1,0 +1,301 @@
+@model DesafioBackend.Web.Models.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Painel de Administração";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Painel Geral</h1>
+        <p class="text-muted mb-0">Visão consolidada da frota, entregadores, contratos de locação e entregas.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Motos" asp-action="Cadastrar" class="btn btn-outline-primary btn-sm">+ Cadastrar Moto</a>
+        <a asp-controller="Entregadores" asp-action="Cadastrar" class="btn btn-outline-success btn-sm">+ Cadastrar Entregador</a>
+        <a asp-controller="Locacoes" asp-action="Nova" class="btn btn-outline-warning btn-sm">+ Nova Locação</a>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovaEntrega">
+            + Criar Pedido de Entrega
+        </button>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @Model.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 border-top border-primary border-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0 text-primary">🏍️ Motos</h2>
+                    <span class="fs-4 fw-bold">@Model.Motorcycles.Count</span>
+                </div>
+                <p class="text-muted small">Motos cadastradas na frota, com suporte a mensageria e notificações.</p>
+                <div class="d-flex justify-content-between pt-2 border-top">
+                    <a asp-controller="Motos" asp-action="Index" class="btn btn-sm btn-link p-0 text-decoration-none">Ver todas as motos &rarr;</a>
+                    <a asp-controller="Motos" asp-action="Cadastrar" class="btn btn-sm btn-outline-primary">+ Cadastrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 border-top border-success border-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0 text-success">👤 Entregadores</h2>
+                    <span class="fs-4 fw-bold">@Model.Drivers.Count</span>
+                </div>
+                <p class="text-muted small">Entregadores cadastrados, controle de habilitações (A/B/AB) e fotos de CNH.</p>
+                <div class="d-flex justify-content-between pt-2 border-top">
+                    <a asp-controller="Entregadores" asp-action="Index" class="btn btn-sm btn-link p-0 text-decoration-none">Ver entregadores &rarr;</a>
+                    <a asp-controller="Entregadores" asp-action="Cadastrar" class="btn btn-sm btn-outline-success">+ Cadastrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 border-top border-warning border-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0 text-warning">📑 Locações</h2>
+                    <span class="fs-4 fw-bold">@Model.Rentals.Count</span>
+                </div>
+                <p class="text-muted small">Contratos de locação ativos por plano (7, 15, 30, 45 ou 50 dias) e devoluções.</p>
+                <div class="d-flex justify-content-between pt-2 border-top">
+                    <a asp-controller="Locacoes" asp-action="Index" class="btn btn-sm btn-link p-0 text-decoration-none">Ver locações &rarr;</a>
+                    <a asp-controller="Locacoes" asp-action="Nova" class="btn btn-sm btn-outline-warning">+ Alugar Moto</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seção: Entregas Disponíveis na Plataforma -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="h5 mb-0">📦 Entregas Disponíveis na Plataforma</h2>
+            <small class="text-muted">Aguardando vinculação com entregadores que possuem locação de moto ativa.</small>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNovaEntrega">
+            + Novo Pedido
+        </button>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.AvailableDeliveries.Count == 0)
+        {
+            <div class="p-4 text-center text-muted">
+                Nenhuma entrega disponível no momento.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Identificador</th>
+                            <th>Pedido</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                            <th class="text-end" style="min-width: 320px;">Vincular a Entregador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var delivery in Model.AvailableDeliveries)
+                    {
+                        <tr>
+                            <td><code>@delivery.Identificador</code></td>
+                            <td><strong>@delivery.PedidoId</strong></td>
+                            <td>@delivery.Descricao</td>
+                            <td><span class="badge bg-info text-dark">Disponível</span></td>
+                            <td class="text-end">
+                                @if (Model.EligibleDrivers.Count > 0)
+                                {
+                                    <form asp-controller="Admin" asp-action="VincularEntrega" method="post" class="d-flex gap-1 justify-content-end align-items-center">
+                                        <input type="hidden" name="entregaId" value="@delivery.Identificador" />
+                                        <select name="entregadorId" class="form-select form-select-sm" style="max-width: 230px;" required>
+                                            <option value="">Selecione o entregador...</option>
+                                            @foreach (var driver in Model.EligibleDrivers)
+                                            {
+                                                <option value="@driver.Id">@driver.Nome (Moto: @driver.MotoId)</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-success text-nowrap">
+                                            ✓ Vincular
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="small text-muted">
+                                        <span class="badge bg-warning text-dark">Sem moto alugada</span>
+                                        <a asp-controller="Locacoes" asp-action="Nova" class="ms-1 text-decoration-none">Alugar moto</a>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Seção: Entregas em Andamento (Aceitas) -->
+@if (Model.AcceptedDeliveries.Count > 0)
+{
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+            <h2 class="h5 mb-0 text-success">🚚 Entregas em Andamento</h2>
+            <small class="text-muted">Entregas aceitas que estão sendo realizadas pelos entregadores.</small>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Identificador</th>
+                            <th>Pedido</th>
+                            <th>Descrição</th>
+                            <th>Entregador</th>
+                            <th>Aceita em</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var delivery in Model.AcceptedDeliveries)
+                    {
+                        <tr>
+                            <td><code>@delivery.Identificador</code></td>
+                            <td><strong>@delivery.PedidoId</strong></td>
+                            <td>@delivery.Descricao</td>
+                            <td><span class="badge bg-secondary">@delivery.EntregadorId</span></td>
+                            <td>@(delivery.AceitaEm.HasValue ? delivery.AceitaEm.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                            <td><span class="badge bg-primary">Em Trânsito</span></td>
+                            <td class="text-end">
+                                <form asp-controller="Admin" asp-action="ConcluirEntrega" method="post" class="d-inline">
+                                    <input type="hidden" name="entregaId" value="@delivery.Identificador" />
+                                    <input type="hidden" name="entregadorId" value="@delivery.EntregadorId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        ✓ Concluir Entrega
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Seção: Entregas Concluídas -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="h5 mb-0 text-success">✅ Entregas Concluídas</h2>
+            <small class="text-muted">Histórico de entregas finalizadas pelos entregadores na plataforma.</small>
+        </div>
+        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold">
+            @Model.CompletedDeliveries.Count concluída(s)
+        </span>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.CompletedDeliveries.Count == 0)
+        {
+            <div class="p-4 text-center text-muted">
+                Nenhuma entrega concluída até o momento.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Identificador</th>
+                            <th>Pedido</th>
+                            <th>Descrição</th>
+                            <th>Entregador</th>
+                            <th>Aceita em</th>
+                            <th>Concluído em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var delivery in Model.CompletedDeliveries)
+                    {
+                        <tr>
+                            <td><code>@delivery.Identificador</code></td>
+                            <td><strong>@delivery.PedidoId</strong></td>
+                            <td>@delivery.Descricao</td>
+                            <td><span class="badge bg-secondary">@delivery.EntregadorId</span></td>
+                            <td>@(delivery.AceitaEm.HasValue ? delivery.AceitaEm.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    @(delivery.ConcluidaEm.HasValue ? delivery.ConcluidaEm.Value.ToString("dd/MM/yyyy HH:mm") : "-")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal para Criação de Novo Pedido de Entrega -->
+<div class="modal fade" id="modalNovaEntrega" tabindex="-1" aria-labelledby="modalNovaEntregaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow">
+            <form asp-controller="Admin" asp-action="CriarEntrega" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNovaEntregaLabel">📦 Registrar Novo Pedido de Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="inputPedidoId" class="form-label fw-bold">Identificador do Pedido</label>
+                        <input type="text" class="form-control" id="inputPedidoId" name="pedidoId" placeholder="Ex: PED-1025" required />
+                        <div class="form-text">Código de rastreamento ou número único do pedido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputDescricao" class="form-label fw-bold">Descrição da Entrega</label>
+                        <textarea class="form-control" id="inputDescricao" name="descricao" rows="3" placeholder="Ex: Entrega de encomenda na Av. Brigadeiro Faria Lima, 2000" required></textarea>
+                    </div>
+                    <div class="alert alert-info small mb-0">
+                        💡 Assim que criado, o pedido ficará imediatamente disponível na lista para ser vinculado a qualquer entregador com locação ativa.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4">Criar Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

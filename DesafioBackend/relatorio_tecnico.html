@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório Técnico do Sistema - Desafio Backend Motor Rent</title>
+<style>
+    @page {
+        size: A4;
+        margin: 18mm 16mm 18mm 16mm;
+        @bottom-right {
+            content: counter(page);
+        }
+    }
+    
+    * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        color: #1e293b;
+        background-color: #ffffff;
+        line-height: 1.55;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Cover Page */
+    .cover {
+        height: 100vh;
+        min-height: 250mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        page-break-after: always;
+        padding: 40px 20px 20px 20px;
+    }
+
+    .cover-header {
+        border-bottom: 4px solid #059669;
+        padding-bottom: 25px;
+    }
+
+    .badge-tag {
+        display: inline-block;
+        background-color: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 8.5pt;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .cover-title {
+        font-size: 28pt;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 10px 0;
+        line-height: 1.15;
+    }
+
+    .cover-subtitle {
+        font-size: 13pt;
+        color: #475569;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .cover-summary {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 6px solid #059669;
+        padding: 20px;
+        border-radius: 6px;
+        margin: 40px 0;
+    }
+
+    .cover-summary h3 {
+        margin-top: 0;
+        color: #0f172a;
+        font-size: 11pt;
+    }
+
+    .cover-summary p {
+        margin: 0;
+        color: #334155;
+        font-size: 9.5pt;
+    }
+
+    .cover-footer {
+        border-top: 1px solid #e2e8f0;
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 8.5pt;
+        color: #64748b;
+    }
+
+    .meta-group strong {
+        color: #1e293b;
+        display: block;
+        font-size: 9pt;
+    }
+
+    /* Headings */
+    h1 {
+        font-size: 16pt;
+        color: #0f172a;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 8px;
+        margin-top: 28px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        page-break-after: avoid;
+    }
+
+    h1::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 18px;
+        background-color: #059669;
+        margin-right: 10px;
+        border-radius: 2px;
+    }
+
+    h2 {
+        font-size: 12.5pt;
+        color: #1e293b;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        page-break-after: avoid;
+        font-weight: 700;
+    }
+
+    h3 {
+        font-size: 10.5pt;
+        color: #334155;
+        margin-top: 14px;
+        margin-bottom: 6px;
+        page-break-after: avoid;
+    }
+
+    p {
+        margin: 0 0 10px 0;
+        text-align: justify;
+    }
+
+    ul, ol {
+        margin: 0 0 12px 0;
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 5px;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 16px 0;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
+    }
+
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 7px 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f1f5f9;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    /* Code & Callouts */
+    code {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: #f1f5f9;
+        color: #0f172a;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 8pt;
+        border: 1px solid #e2e8f0;
+    }
+
+    pre {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: #0f172a;
+        color: #f8fafc;
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 7.8pt;
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 10px 0 14px 0;
+        page-break-inside: avoid;
+    }
+
+    .alert {
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin: 12px 0;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
+    }
+
+    .alert-info {
+        background-color: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        color: #1e3a8a;
+    }
+
+    .alert-success {
+        background-color: #ecfdf5;
+        border-left: 4px solid #10b981;
+        color: #064e3b;
+    }
+
+    .alert-warning {
+        background-color: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        color: #78350f;
+    }
+
+    /* Architecture Diagram Blocks */
+    .arch-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 14px 0;
+        page-break-inside: avoid;
+    }
+
+    .arch-card {
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 12px;
+        background: #f8fafc;
+    }
+
+    .arch-card-header {
+        font-weight: 700;
+        font-size: 9.5pt;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 4px;
+    }
+
+    .badge-sub {
+        display: inline-block;
+        padding: 2px 6px;
+        font-size: 7pt;
+        font-weight: bold;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+    .badge-api { background: #dbeafe; color: #1e40af; }
+    .badge-web { background: #dcfce7; color: #15803d; }
+    .badge-rabbit { background: #ffedd5; color: #9a3412; }
+    .badge-db { background: #f3e8ff; color: #6b21a8; }
+
+    .page-break {
+        page-break-before: always;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 7.5pt;
+        font-weight: 600;
+        border-radius: 12px;
+    }
+    .pill-green { background-color: #d1fae5; color: #065f46; }
+    .pill-blue { background-color: #dbeafe; color: #1e40af; }
+    .pill-amber { background-color: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+
+<!-- CAPA DO RELATÓRIO -->
+<div class="cover">
+    <div class="cover-header">
+        <span class="badge-tag">Documentação Técnica Executiva</span>
+        <h1 class="cover-title" style="border:none; padding:0; margin:0 0 10px 0;">Desafio Backend Motor Rent</h1>
+        <div class="cover-subtitle">Relatório Completo de Arquitetura, Funcionalidades, Microsserviços e Guia Operacional</div>
+    </div>
+
+    <div class="cover-summary">
+        <h3>Sumário do Sistema</h3>
+        <p>Este relatório técnico apresenta detalhadamente a engenharia, arquitetura e funcionamento do ecossistema construído para o desafio de gestão de frota de motos, motoristas entregadores, locações e gerenciamento de entregas. O sistema adota os princípios de <strong>Domain-Driven Design (DDD)</strong> e <strong>Clean Architecture</strong>, fundamentado na plataforma <strong>.NET 8</strong>, mensageria distribuída com <strong>RabbitMQ (MassTransit)</strong>, persistência relacional com <strong>PostgreSQL 16</strong> e orquestração de containers com <strong>Docker Compose</strong>.</p>
+    </div>
+
+    <div class="cover-footer">
+        <div class="meta-group">
+            <strong>Plataforma & Framework</strong>
+            .NET 8 LTS (C# 12) / ASP.NET Core
+        </div>
+        <div class="meta-group">
+            <strong>Orquestração & Infra</strong>
+            Docker Compose / Alpine Linux
+        </div>
+        <div class="meta-group">
+            <strong>Banco & Mensageria</strong>
+            PostgreSQL 16 / RabbitMQ 3
+        </div>
+        <div class="meta-group">
+            <strong>Data da Emissão</strong>
+            Novembro / 2026
+        </div>
+    </div>
+</div>
+
+<!-- SEÇÃO 1: VISÃO GERAL E ARQUITETURA -->
+<h1>1. Visão Geral da Solução e Arquitetura</h1>
+
+<p>A solução foi projetada sob o paradigma de <strong>Domain-Driven Design (DDD)</strong> e <strong>Clean Architecture</strong> (Arquitetura Limpa), estabelecendo limites arquiteturais claros, isolamento de responsabilidades e desacoplamento absoluto do núcleo de negócios em relação a frameworks, drivers e infraestrutura.</p>
+
+<div class="arch-container">
+    <div class="arch-card">
+        <div class="arch-card-header">
+            <span class="badge-sub badge-api">API REST</span>
+            DesafioBackend.Api (Porta 5000)
+        </div>
+        <p style="font-size:8pt; margin:0;">Ponto de entrada HTTP RESTful conforme contrato OpenAPI/Swagger. Provê autenticação JWT Bearer, tratamento global de exceções, upload de documentos e injeção de dependências.</p>
+    </div>
+
+    <div class="arch-card">
+        <div class="arch-card-header">
+            <span class="badge-sub badge-web">Web MVC</span>
+            DesafioBackend.Web (Porta 5001)
+        </div>
+        <p style="font-size:8pt; margin:0;">Portal Administrativo em ASP.NET Core MVC. Permite gestão visual de motos, entregadores, locações com simulação de taxas e controle em tempo real de pedidos disponíveis, em trânsito e concluídos.</p>
+    </div>
+
+    <div class="arch-card">
+        <div class="arch-card-header">
+            <span class="badge-sub badge-rabbit">Mensageria</span>
+            RabbitMQ + MassTransit (Porta 5672 / 15672)
+        </div>
+        <p style="font-size:8pt; margin:0;">Broker orientado a eventos assíncronos. Processa eventos de domínio como <code>MotorcycleRegisteredEvent</code>, filtrando motos do ano 2024 para auditoria e notificações reativas.</p>
+    </div>
+
+    <div class="arch-card">
+        <div class="arch-card-header">
+            <span class="badge-sub badge-db">Persistência</span>
+            PostgreSQL 16 (Porta 5433 / 5432)
+        </div>
+        <p style="font-size:8pt; margin:0;">Banco relacional com transações atômicas ACID, índices únicos de negócio (CNPJ, CNH, Placa), migrações automáticas via EF Core e volume persistente para segurança dos dados.</p>
+    </div>
+</div>
+
+<h2>Estrutura em Camadas da Solução</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th style="width:28%;">Camada / Projeto</th>
+            <th style="width:25%;">Responsabilidade Primária</th>
+            <th>Principais Componentes e Padrões</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>DesafioBackend.Domain</strong></td>
+            <td>Regras de negócio corporativas e invariantes do sistema. Não possui dependência de frameworks.</td>
+            <td>
+                • Entidades: <code>Motorcycle</code>, <code>DeliveryDriver</code>, <code>Rental</code>, <code>Delivery</code>, <code>MotorcycleNotification</code><br>
+                • Enums: <code>DriverLicenseType</code> (A, B, AB), <code>RentalPlanType</code> (7, 15, 30, 45, 50 dias), <code>DeliveryStatus</code><br>
+                • Eventos: <code>MotorcycleRegisteredEvent</code><br>
+                • Interfaces: <code>IMotorcycleRepository</code>, <code>IRentalRepository</code>, <code>IUnitOfWork</code>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DesafioBackend.Application</strong></td>
+            <td>Orquestração dos casos de uso, contratos de entrada e saída (DTOs) e fluxos de aplicação.</td>
+            <td>
+                • Serviços: <code>MotorcycleService</code>, <code>DeliveryDriverService</code>, <code>RentalService</code>, <code>DeliveryService</code><br>
+                • DTOs: Requests e Responses padronizados para o Swagger<br>
+                • Interfaces de Infraestrutura: <code>IMessageBus</code>, <code>IStorageService</code><br>
+                • Exceções de Domínio: <code>ValidationException</code>, <code>NotFoundException</code>, <code>ConflictException</code>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DesafioBackend.Infrastructure</strong></td>
+            <td>Implementação de acesso a dados, integração com mensageria e sistema de arquivos.</td>
+            <td>
+                • EF Core 8 com Npgsql e Mapeamentos Fluent API (<code>AppDbContext</code>)<br>
+                • Repositórios concretos e Unit of Work atômico<br>
+                • MassTransit: <code>MassTransitMessageBus</code> e Consumer <code>MotorcycleCreatedConsumer</code><br>
+                • Storage: <code>LocalStorageService</code> com persistência em disco de arquivos PNG/BMP
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DesafioBackend.Api</strong></td>
+            <td>Interface de comunicação externa HTTP (REST API).</td>
+            <td>
+                • Controllers: <code>MotosController</code>, <code>EntregadoresController</code>, <code>LocacaoController</code>, <code>EntregasController</code>, <code>AuthController</code><br>
+                • Middlewares: <code>GlobalExceptionMiddleware</code> (padronização de payload de erro)<br>
+                • Swagger com configuração de autenticação JWT Bearer
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DesafioBackend.Web</strong></td>
+            <td>Interface Gráfica Web para Gestão Operacional e Administrativa.</td>
+            <td>
+                • ASP.NET Core MVC com Razor Views e Bootstrap 5<br>
+                • <code>ApiClient</code> com <code>JwtTokenHandler</code> para repasse transparente de credenciais<br>
+                • Telas de Auditoria de Entregas Disponíveis, Em Andamento e Concluídas
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 2: ARQUITETURA DOCKER E CONTEINERIZAÇÃO -->
+<h1>2. Infraestrutura e Orquestração com Docker Compose</h1>
+
+<p>Toda a stack de microsserviços e dependências é orquestrada através do arquivo <code>docker-compose.yml</code>, permitindo que a aplicação seja inicializada do zero com um único comando, sem necessidade de configuração prévia de bancos de dados ou servidores na máquina hospedeira.</p>
+
+<h2>Topologia de Rede e Portas dos Serviços</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Serviço</th>
+            <th>Container Name</th>
+            <th>Porta Externa (Host)</th>
+            <th>Porta Interna (Docker)</th>
+            <th>Healthcheck & Dependência</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>PostgreSQL 16</strong></td>
+            <td><code>desafio_backend_postgres</code></td>
+            <td><strong>5433</strong></td>
+            <td>5432</td>
+            <td><code>pg_isready -U postgres -d desafiodb</code></td>
+        </tr>
+        <tr>
+            <td><strong>RabbitMQ 3</strong></td>
+            <td><code>desafio_backend_rabbitmq</code></td>
+            <td><strong>5672</strong> (AMQP)<br><strong>15672</strong> (Web)</td>
+            <td>5672<br>15672</td>
+            <td><code>rabbitmq-diagnostics -q ping</code></td>
+        </tr>
+        <tr>
+            <td><strong>API Backend (.NET 8)</strong></td>
+            <td><code>desafio_backend_api</code></td>
+            <td><strong>5000</strong></td>
+            <td>8080</td>
+            <td>Inicia apenas após <code>db</code> e <code>rabbitmq</code> estarem <em>healthy</em></td>
+        </tr>
+        <tr>
+            <td><strong>Painel Web MVC (.NET 8)</strong></td>
+            <td><code>desafio_backend_web</code></td>
+            <td><strong>5001</strong></td>
+            <td>8080</td>
+            <td>Inicia após a <code>api</code> estar operacional</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="alert alert-info">
+    <strong>💡 Migrações Automáticas do Banco de Dados:</strong> Na inicialização do container <code>desafio_backend_api</code>, o método <code>context.Database.MigrateAsync()</code> é executado automaticamente no <code>Program.cs</code>. Desta forma, todas as tabelas, índices e restrições são criados sem requerer comandos manuais.
+</div>
+
+<h2>Configuração do Dockerfile Multi-Stage</h2>
+<p>Tanto a API quanto o projeto Web utilizam <strong>Dockerfiles multi-stage</strong> baseados na imagem oficial <code>mcr.microsoft.com/dotnet/sdk:8.0</code> para compilação e <code>mcr.microsoft.com/dotnet/aspnet:8.0-alpine</code> para execução em produção. Isso garante:</p>
+<ul>
+    <li>Tamanho reduzido de imagem (menos de 220 MB por container).</li>
+    <li>Superfície de ataque mínima por utilizar o kernel Alpine Linux endurecido.</li>
+    <li>Separação total entre ferramentas de build (SDK, compiladores) e o runtime final.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 3: MENSAGERIA ASSÍNCRONA E RABBITMQ -->
+<h1>3. Mensageria Assíncrona e Arquitetura Orientada a Eventos (RabbitMQ)</h1>
+
+<p>O sistema adota mensageria para desacoplar operações de cadastro de frotas e processamento reativo. A comunicação com o broker RabbitMQ é abstraída através do <strong>MassTransit</strong>, framework padrão da indústria que provê resiliência, reconnect automático e tópicos baseados em tipos de eventos.</p>
+
+<h2>Fluxo de Publicação e Consumo de Eventos</h2>
+
+<pre>
+[Cliente / Web]  --(POST /motos)-->  [MotorcycleService]
+                                            │
+                                            ├── 1. Persiste no PostgreSQL (AppDbContext)
+                                            │
+                                            └── 2. Publica no RabbitMQ (IMessageBus.PublishAsync)
+                                                        │
+                                                        ▼ (Exchange: MotorcycleRegisteredEvent)
+                                                ┌──────────────────────┐
+                                                │   Fila do RabbitMQ   │
+                                                └──────────────────────┘
+                                                        │
+                                                        ▼ (Consumo Assíncrono)
+                                            [MotorcycleCreatedConsumer]
+                                                        │
+                              ┌─────────────────────────┴────────────────────────┐
+                              ▼                                                  ▼
+                     [Ano == 2024] ?                                   [Ano != 2024]
+                              │                                                  │
+            Grava Notificação no Banco de Dados                               Ignora
+              (Tabela: motorcycle_notifications)
+</pre>
+
+<h2>Detalhamento do Produtor e Consumidor</h2>
+
+<h3>1. Produtor (Producer - MotorcycleService)</h3>
+<p>Ao receber uma requisição de cadastro de moto válida, o serviço de aplicação persiste o registro e dispara o evento assíncrono:</p>
+<pre>
+await _messageBus.PublishAsync(
+    new MotorcycleRegisteredEvent(motorcycle.Id, motorcycle.Year, motorcycle.Model, motorcycle.Plate), 
+    cancellationToken);
+</pre>
+
+<h3>2. Consumidor (Consumer - MotorcycleCreatedConsumer)</h3>
+<p>O consumidor escuta a fila dedicada e implementa a regra de negócio do desafio técnico: quando o ano de fabricação da moto for <strong>2024</strong>, uma notificação especial deve ser gerada e persistida:</p>
+<pre>
+public async Task Consume(ConsumeContext&lt;MotorcycleRegisteredEvent&gt; context)
+{
+    var message = context.Message;
+    if (message.Year == 2024)
+    {
+        var notification = new MotorcycleNotification(
+            id: Guid.NewGuid().ToString(),
+            motorcycleId: message.MotorcycleId,
+            year: message.Year,
+            model: message.Model,
+            plate: message.Plate,
+            message: $"Moto ano 2024 cadastrada com sucesso com a placa {message.Plate}."
+        );
+        await _notificationRepository.AddAsync(notification, context.CancellationToken);
+        await _unitOfWork.CommitAsync(context.CancellationToken);
+    }
+}
+</pre>
+
+<div class="alert alert-success">
+    <strong>Auditoria no Painel do RabbitMQ:</strong> O administrador pode acompanhar as filas ativas, taxas de entrega e mensagens em trânsito através do painel oficial em <a href="http://localhost:15672">http://localhost:15672</a> (usuário: <code>guest</code>, senha: <code>guest</code>).
+</div>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 4: FUNCIONALIDADES DE NEGÓCIO E REGRAS -->
+<h1>4. Especificação das Funcionalidades de Negócio</h1>
+
+<h2>4.1. Gestão de Frotas de Motos</h2>
+<ul>
+    <li><strong>Cadastro de Moto:</strong> Requer <code>identificador</code> único, <code>ano</code>, <code>modelo</code> e <code>placa</code> única. Caso a placa ou identificador já existam, a API retorna erro 400.</li>
+    <li><strong>Consulta e Filtro por Placa:</strong> Permite consultar todas as motos ou filtrar via query string <code>GET /motos?placa=XYZ</code>.</li>
+    <li><strong>Atualização de Placa:</strong> Endpoint <code>PUT /motos/{id}/placa</code> permite modificar exclusivamente a placa, garantindo que a nova placa não colida com outra moto existente.</li>
+    <li><strong>Exclusão de Moto:</strong> Endpoint <code>DELETE /motos/{id}</code>. Valida integridade referencial: caso a moto possua qualquer registro histórico de locação vinculado, a exclusão é rejeitada com erro 400.</li>
+</ul>
+
+<h2>4.2. Gestão de Motoristas Entregadores</h2>
+<ul>
+    <li><strong>Cadastro com Unicidade:</strong> Validação obrigatória de unicidade de <code>CNPJ</code> e <code>numero_cnh</code> em nível de aplicação e banco de dados (índices únicos).</li>
+    <li><strong>Categorias de CNH Aceitas:</strong> Suporta categorias <code>A</code>, <code>B</code> e <code>A+B</code>.</li>
+    <li><strong>Upload de Imagem da CNH:</strong> Endpoint <code>POST /entregadores/{id}/cnh</code> recebe a imagem em formato <code>multipart/form-data</code>. O serviço valida formatos permitidos (<code>.png</code> e <code>.bmp</code>) e salva o arquivo em diretório seguro configurado, atualizando a URL no perfil do entregador.</li>
+</ul>
+
+<h2>4.3. Gestão de Locação de Motos e Regras Financeiras</h2>
+
+<p>O módulo de locações implementa as regras rigorosas de elegibilidade e tarifas contratuais:</p>
+
+<div class="alert alert-warning">
+    <strong>Regra de Habilitação:</strong> Apenas entregadores habilitados na <strong>categoria A</strong> (ou <strong>A+B</strong>) têm permissão para alugar motos. Entregadores que possuem apenas categoria B são bloqueados.
+</div>
+
+<h3>Tabela de Planos Contratuais e Custos</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Plano (Duração)</th>
+            <th>Valor da Diária</th>
+            <th>Custo Base Contratual</th>
+            <th>Regra de Devolução Antecipada (Multa)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>7 dias</strong></td>
+            <td>R$ 30,00 / dia</td>
+            <td>R$ 210,00</td>
+            <td>Diárias utilizadas + <strong>20% de multa</strong> sobre o valor das diárias não efetivadas</td>
+        </tr>
+        <tr>
+            <td><strong>15 dias</strong></td>
+            <td>R$ 28,00 / dia</td>
+            <td>R$ 420,00</td>
+            <td>Diárias utilizadas + <strong>40% de multa</strong> sobre o valor das diárias não efetivadas</td>
+        </tr>
+        <tr>
+            <td><strong>30 dias</strong></td>
+            <td>R$ 22,00 / dia</td>
+            <td>R$ 660,00</td>
+            <td>Valor contratual integral das diárias utilizadas</td>
+        </tr>
+        <tr>
+            <td><strong>45 dias</strong></td>
+            <td>R$ 20,00 / dia</td>
+            <td>R$ 900,00</td>
+            <td>Valor contratual integral das diárias utilizadas</td>
+        </tr>
+        <tr>
+            <td><strong>50 dias</strong></td>
+            <td>R$ 18,00 / dia</td>
+            <td>R$ 900,00</td>
+            <td>Valor contratual integral das diárias utilizadas</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>Regra de Atraso na Devolução:</strong> Caso a moto seja devolvida após a data prevista de término, é cobrado o valor total base do plano contratado acrescido de uma <strong>tarifa fixa de R$ 50,00 por diária adicional</strong> excedente.</p>
+<p><strong>Início Obrigatório da Locação:</strong> A data de início da locação deve ser obrigatoriamente o <strong>primeiro dia útil seguinte à data de criação</strong> (<code>D + 1</code>).</p>
+
+<h2>4.4. Gestão de Pedidos e Entregas</h2>
+<ul>
+    <li><strong>Criação de Pedidos:</strong> Pedidos com descrição e identificador são disponibilizados na plataforma com status <span class="status-pill pill-amber">Available</span>.</li>
+    <li><strong>Vinculação e Aceite:</strong> Um entregador só pode aceitar uma entrega se tiver uma <strong>locação ativa</strong> no momento. O status passa para <span class="status-pill pill-blue">Accepted</span>.</li>
+    <li><strong>Conclusão da Entrega:</strong> Apenas o motorista vinculado ao pedido tem permissão para marcar a entrega como <span class="status-pill pill-green">Completed</span>.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 5: PAINEL WEB ADMINISTRATIVO -->
+<h1>5. Painel Web Administrativo (ASP.NET Core MVC)</h1>
+
+<p>O projeto <strong>DesafioBackend.Web</strong> foi implementado em ASP.NET Core MVC para fornecer aos operadores e administradores uma interface moderna, rápida e intuitiva para controle total das operações da plataforma em <code>http://localhost:5001</code>.</p>
+
+<h2>Principais Módulos da Interface Gráfica</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th style="width:25%;">Módulo</th>
+            <th style="width:30%;">Funcionalidade</th>
+            <th>Recursos em Destaque</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Autenticação & Sessão</strong></td>
+            <td>Login seguro para administradores (<code>/Auth/Login</code>).</td>
+            <td>Sessão por cookies seguros (HttpOnly), proteção contra CSRF (ValidateAntiForgeryToken) e repasse automático de token JWT para a API.</td>
+        </tr>
+        <tr>
+            <td><strong>Painel Geral (Admin)</strong></td>
+            <td>Visão panorâmica em tempo real com cards de métricas.</td>
+            <td>Totalizadores de motos, motoristas cadastrados, locações ativas e pedidos de entrega em andamento.</td>
+        </tr>
+        <tr>
+            <td><strong>Gestão de Motos</strong></td>
+            <td>Cadastro e consulta de veículos com botão de retorno.</td>
+            <td>Filtro dinâmico por placa, modal de cadastro e tabela de dados com formatação elegante.</td>
+        </tr>
+        <tr>
+            <td><strong>Gestão de Entregadores</strong></td>
+            <td>Controle de motoristas e habilitações.</td>
+            <td>Visualização do status da CNH, preview de imagem enviada e identificação rápida de categoria A/B/AB.</td>
+        </tr>
+        <tr>
+            <td><strong>Gestão de Locações</strong></td>
+            <td>Contratação de planos e baixa de devolução.</td>
+            <td>Cálculo automático de diárias, simulação de multas por devolução antecipada ou juros por atraso.</td>
+        </tr>
+        <tr>
+            <td><strong>Entregas Disponíveis</strong></td>
+            <td>Painel para vincular pedidos a motoristas elegíveis.</td>
+            <td>Lista suspensa inteligente: exibe apenas entregadores com moto atualmente alugada para evitar vínculos inválidos.</td>
+        </tr>
+        <tr>
+            <td><strong>Entregas em Andamento</strong></td>
+            <td>Acompanhamento de pedidos em trânsito.</td>
+            <td>Exibe motorista responsável, data/hora de aceite e botão de um clique para confirmação de entrega concluída.</td>
+        </tr>
+        <tr>
+            <td><strong>Entregas Concluídas</strong></td>
+            <td>Histórico e auditoria de entregas finalizadas.</td>
+            <td>Tabela formatada no padrão oficial: <em>Identificador | Pedido | Descrição | Entregador | Aceita em | Concluído em</em>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 6: SEGURANÇA E DOCUMENTAÇÃO SWAGGER -->
+<h1>6. Segurança, Autenticação e Documentação OpenAPI / Swagger</h1>
+
+<h2>Mecanismo de Autenticação JWT Bearer</h2>
+<p>A API implementa autenticação baseada em tokens <strong>JSON Web Token (JWT)</strong> assinados com algoritmo HMAC-SHA256.</p>
+<ul>
+    <li><strong>Endpoint de Login:</strong> <code>POST /auth/login</code> recebe usuário e senha (padrão: <code>admin</code> / <code>admin</code>) e retorna o token com tempo de expiração e claims de permissão.</li>
+    <li><strong>Proteção de Endpoints:</strong> As rotas de negócio exigem o cabeçalho <code>Authorization: Bearer &lt;token&gt;</code>, garantindo que requisições não autorizadas sejam rejeitadas com status <strong>401 Unauthorized</strong>.</li>
+</ul>
+
+<h2>Configuração do Swagger com Suporte a Bearer Token</h2>
+<p>A interface do Swagger em <code>http://localhost:5000</code> está equipada com o recurso <code>AddSecurityDefinition("Bearer", ...)</code>:</p>
+<ol>
+    <li>Ao acessar a documentação interativa, clique no botão <strong>Authorize</strong> (ícone de cadeado verde no topo).</li>
+    <li>Insira o token obtido no endpoint de autenticação no formato: <code>Bearer &lt;seu_token&gt;</code>.</li>
+    <li>A partir deste momento, todas as requisições disparadas pelo Swagger incluirão automaticamente o token de autorização.</li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 7: TESTES E CONFIABILIDADE -->
+<h1>7. Testes Automatizados e Confiabilidade</h1>
+
+<p>O projeto adota a pirâmide de testes para garantir que as regras financeiras e de integridade do domínio nunca sofram regressões.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Projeto de Testes</th>
+            <th>Tipo de Teste</th>
+            <th>Quantidade</th>
+            <th>Status</th>
+            <th>Cenários Cobertos</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>DesafioBackend.UnitTests</strong></td>
+            <td>Testes Unitários de Domínio e Casos de Uso</td>
+            <td><strong>21 testes</strong></td>
+            <td><span class="status-pill pill-green">100% Aprovado</span></td>
+            <td>
+                • Cálculo de tarifas para planos de 7, 15, 30, 45 e 50 dias<br>
+                • Aplicação exata de multa de 20% (7 dias) e 40% (15 dias)<br>
+                • Cálculo de taxa de R$ 50/dia por atraso na devolução<br>
+                • Validação de CNH categoria A vs categoria B<br>
+                • Invariantes de data de início (D+1) e integridade de entidades
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DesafioBackend.IntegrationTests</strong></td>
+            <td>Testes de Integração de Endpoints da API</td>
+            <td><strong>4 testes</strong></td>
+            <td><span class="status-pill pill-green">100% Aprovado</span></td>
+            <td>
+                • Fluxo de login e geração de JWT<br>
+                • Cadastro e consulta de motos via HTTP<br>
+                • Rejeição de duplicidade de placa e identificador<br>
+                • Respostas padronizadas de erro 400 e 404
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SEÇÃO 8: GUIA OPERACIONAL E DEBUGGING -->
+<h1>8. Guia Operacional, Credenciais e Depuração no Visual Studio</h1>
+
+<h2>Tabela Resumo de Credenciais e Acesso</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Recurso</th>
+            <th>Endereço / Host</th>
+            <th>Porta</th>
+            <th>Usuário</th>
+            <th>Senha</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Painel Web MVC</strong></td>
+            <td><code>http://localhost:5001</code></td>
+            <td>5001</td>
+            <td><code>admin</code></td>
+            <td><code>admin</code></td>
+        </tr>
+        <tr>
+            <td><strong>API Swagger</strong></td>
+            <td><code>http://localhost:5000</code></td>
+            <td>5000</td>
+            <td><code>admin</code></td>
+            <td><code>admin</code></td>
+        </tr>
+        <tr>
+            <td><strong>RabbitMQ Management</strong></td>
+            <td><code>http://localhost:15672</code></td>
+            <td>15672</td>
+            <td><code>guest</code></td>
+            <td><code>guest</code></td>
+        </tr>
+        <tr>
+            <td><strong>PostgreSQL</strong></td>
+            <td><code>localhost</code> (banco: <code>desafiodb</code>)</td>
+            <td>5433</td>
+            <td><code>postgres</code></td>
+            <td><code>postgrespassword</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Procedimentos de Depuração no Visual Studio 2022</h2>
+
+<h3>Opção A: Depuração Local com Dependências no Docker (Recomendada)</h3>
+<ol>
+    <li>Inicie apenas o PostgreSQL e o RabbitMQ em background:
+        <pre>docker compose up -d db rabbitmq</pre>
+    </li>
+    <li>Abra a solução <code>DesafioBackend.sln</code> no Visual Studio 2022.</li>
+    <li>Configure inicialização múltipla: clique com botão direito na solução &rarr; <strong>Configurar Projetos de Inicialização...</strong> &rarr; Marque <strong>Iniciar</strong> para <code>DesafioBackend.Api</code> e <code>DesafioBackend.Web</code>.</li>
+    <li>Pressione <strong>F5</strong> para iniciar com breakpoints e Hot Reload ativos.</li>
+</ol>
+
+<h3>Opção B: Anexar o Depurador ao Processo dentro do Container Docker</h3>
+<ol>
+    <li>Suba a stack inteira no terminal: <code>docker compose up -d</code></li>
+    <li>No Visual Studio, pressione <code>Ctrl + Alt + P</code> (<strong>Depurar &rarr; Anexar ao Processo...</strong>).</li>
+    <li>Em <strong>Tipo de Conexão</strong>, escolha <strong>Docker (Contêiner do Linux)</strong>.</li>
+    <li>Selecione o container <code>desafio_backend_api</code> ou <code>desafio_backend_web</code> e anexe ao processo <code>dotnet</code>.</li>
+</ol>
+
+<br>
+<div class="alert alert-success" style="text-align: center; margin-top: 30px;">
+    <strong>Relatório Técnico Concluído</strong><br>
+    Sistema em conformidade técnica integral com todos os requisitos do desafio arquitetural.
+</div>
+
+</body>
+</html>
+

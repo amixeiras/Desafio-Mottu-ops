@@ -1,0 +1,132 @@
+@model DesafioBackend.Web.Models.Locacoes.DevolverLocacaoViewModel
+@{
+    ViewData["Title"] = "Informar Devolução";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h1 class="h4 mb-0">Informar Devolução e Calcular Tarifa</h1>
+            </div>
+            <div class="card-body p-4">
+                <div class="bg-light p-3 rounded mb-4">
+                    <div class="row g-2 small">
+                        <div class="col-6"><strong>Locação:</strong> @Model.Id</div>
+                        <div class="col-6"><strong>Diária Base:</strong> @Model.ValorDiaria.ToString("C2")</div>
+                        <div class="col-6"><strong>Entregador:</strong> @Model.EntregadorId</div>
+                        <div class="col-6"><strong>Moto:</strong> @Model.MotoId</div>
+                        <div class="col-6"><strong>Início:</strong> @Model.DataInicio.ToString("dd/MM/yyyy")</div>
+                        <div class="col-6"><strong>Previsão Término:</strong> @Model.DataPrevisaoTermino.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+
+                <form asp-action="Devolver" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="EntregadorId" />
+                    <input type="hidden" asp-for="MotoId" />
+                    <input type="hidden" asp-for="ValorDiaria" />
+                    <input type="hidden" asp-for="DataInicio" />
+                    <input type="hidden" asp-for="DataPrevisaoTermino" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="DataDevolucao" class="form-label fw-bold"></label>
+                        <input asp-for="DataDevolucao" id="inputDataDevolucao" class="form-control" type="date" />
+                        <span asp-validation-for="DataDevolucao" class="text-danger small"></span>
+                    </div>
+
+                    <div id="simulacaoContainer" class="card border-primary mb-4 bg-light">
+                        <div class="card-body p-3">
+                            <h6 class="card-title text-primary fw-bold mb-2">Simulação da Tarifa</h6>
+                            <div id="simulacaoDetalhes" class="small text-muted mb-2">Selecione uma data para simular a tarifa.</div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                <span class="fw-bold">Valor Final Estimado:</span>
+                                <span id="simulacaoValorFinal" class="fs-5 fw-bold text-success">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info small mb-4">
+                        ℹ️ <strong>Regras do Contrato:</strong>
+                        <ul class="mb-0 mt-1 ps-3">
+                            <li>Devolução antes da data prevista: Diárias utilizadas + multa contratual (20% plano 7d ou 40% plano 15d sobre diárias não efetivadas).</li>
+                            <li>Devolução após a data prevista: Valor base do plano + R$ 50,00 por dia adicional excedente.</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+                        <button type="submit" class="btn btn-warning px-4">Confirmar Devolução</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dataInicio = new Date('@Model.DataInicio.ToString("yyyy-MM-ddT00:00:00")');
+            const dataPrevisao = new Date('@Model.DataPrevisaoTermino.ToString("yyyy-MM-ddT00:00:00")');
+            const valorDiaria = @Model.ValorDiaria.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            const planDays = Math.max(1, Math.round((dataPrevisao - dataInicio) / (1000 * 60 * 60 * 24)));
+            const inputDevolucao = document.getElementById("inputDataDevolucao");
+            const simulacaoDetalhes = document.getElementById("simulacaoDetalhes");
+            const simulacaoValorFinal = document.getElementById("simulacaoValorFinal");
+
+            function calcularTarifa() {
+                if (!inputDevolucao.value) return;
+
+                const parts = inputDevolucao.value.split("-");
+                const dataDev = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+                if (dataDev < dataInicio) {
+                    simulacaoDetalhes.innerHTML = `<span class="text-danger">A data de devolução não pode ser anterior ao início da locação (${dataInicio.toLocaleDateString('pt-BR')}).</span>`;
+                    simulacaoValorFinal.innerText = "R$ 0,00";
+                    return;
+                }
+
+                const baseTotal = planDays * valorDiaria;
+                const diffTime = dataDev.getTime() - dataPrevisao.getTime();
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                let total = baseTotal;
+                let detalhes = "";
+
+                if (diffDays === 0) {
+                    detalhes = `Devolução na data prevista. Plano de ${planDays} dias a R$ ${valorDiaria.toFixed(2)}/dia.`;
+                    total = baseTotal;
+                } else if (diffDays < 0) {
+                    const usedDays = Math.max(0, Math.round((dataDev.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24)));
+                    const unusedDays = Math.max(0, planDays - usedDays);
+                    let penaltyPerc = 0;
+                    if (planDays === 7) penaltyPerc = 0.20;
+                    else if (planDays === 15) penaltyPerc = 0.40;
+
+                    const usedAmount = usedDays * valorDiaria;
+                    const penaltyAmount = unusedDays * valorDiaria * penaltyPerc;
+                    total = usedAmount + penaltyAmount;
+
+                    detalhes = `<strong>Devolução antecipada:</strong> ${usedDays} diárias utilizadas (R$ ${usedAmount.toFixed(2)}) + multa de ${(penaltyPerc * 100).toFixed(0)}% sobre ${unusedDays} diárias não efetivadas (R$ ${penaltyAmount.toFixed(2)}).`;
+                } else {
+                    const extraDays = diffDays;
+                    const extraAmount = extraDays * 50.00;
+                    total = baseTotal + extraAmount;
+                    detalhes = `<strong>Devolução em atraso:</strong> Valor base do plano (R$ ${baseTotal.toFixed(2)}) + ${extraDays} diária(s) adicional(is) a R$ 50,00/dia (R$ ${extraAmount.toFixed(2)}).`;
+                }
+
+                simulacaoDetalhes.innerHTML = detalhes;
+                simulacaoValorFinal.innerText = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+            }
+
+            inputDevolucao.addEventListener("change", calcularTarifa);
+            inputDevolucao.addEventListener("input", calcularTarifa);
+            calcularTarifa();
+        });
+    </script>
+}
+

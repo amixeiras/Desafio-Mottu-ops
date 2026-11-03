@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Guia Prático: Depuração no Visual Studio 2022</title>
+<style>
+    @page {
+        size: A4;
+        margin: 16mm 16mm 16mm 16mm;
+        @bottom-right {
+            content: "Página " counter(page);
+        }
+    }
+    
+    * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        color: #1e293b;
+        background-color: #ffffff;
+        line-height: 1.5;
+        font-size: 9.5pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Header Banner */
+    .header-banner {
+        border-bottom: 3px solid #059669;
+        padding-bottom: 16px;
+        margin-bottom: 22px;
+    }
+
+    .badge-tag {
+        display: inline-block;
+        background-color: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 8pt;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .doc-title {
+        font-size: 22pt;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 6px 0;
+        line-height: 1.2;
+    }
+
+    .doc-subtitle {
+        font-size: 11pt;
+        color: #475569;
+        margin: 0;
+    }
+
+    /* Headings */
+    h1 {
+        font-size: 14pt;
+        color: #0f172a;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 6px;
+        margin-top: 22px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        page-break-after: avoid;
+    }
+
+    h1::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 16px;
+        background-color: #059669;
+        margin-right: 8px;
+        border-radius: 2px;
+    }
+
+    h2 {
+        font-size: 11.5pt;
+        color: #1e293b;
+        margin-top: 16px;
+        margin-bottom: 8px;
+        page-break-after: avoid;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0 0 10px 0;
+        text-align: justify;
+    }
+
+    /* Step Cards */
+    .step-card {
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #3b82f6;
+        background-color: #f8fafc;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 14px;
+        page-break-inside: avoid;
+    }
+
+    .step-card.success {
+        border-left-color: #10b981;
+    }
+
+    .step-card.warning {
+        border-left-color: #f59e0b;
+    }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 10.5pt;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: #0f172a;
+        color: #ffffff;
+        border-radius: 50%;
+        font-size: 8.5pt;
+        font-weight: 800;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 14px 0;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
+    }
+
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 6px 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f1f5f9;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    /* Code & Callouts */
+    code {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: #f1f5f9;
+        color: #0f172a;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 8pt;
+        border: 1px solid #e2e8f0;
+    }
+
+    pre {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: #0f172a;
+        color: #f8fafc;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 8pt;
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 8px 0;
+        page-break-inside: avoid;
+    }
+
+    .alert {
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin: 12px 0;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
+    }
+
+    .alert-info {
+        background-color: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        color: #1e3a8a;
+    }
+
+    .alert-success {
+        background-color: #ecfdf5;
+        border-left: 4px solid #10b981;
+        color: #064e3b;
+    }
+
+    .alert-warning {
+        background-color: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        color: #78350f;
+    }
+
+    .key-badge {
+        display: inline-block;
+        background-color: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-family: 'Consolas', monospace;
+        font-weight: bold;
+        font-size: 8pt;
+        color: #0f172a;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+</style>
+</head>
+<body>
+
+<div class="header-banner">
+    <span class="badge-tag">Guia Técnico Operacional</span>
+    <h1 class="doc-title" style="border:none; padding:0; margin:0 0 4px 0;">Guia de Depuração no Visual Studio 2022</h1>
+    <div class="doc-subtitle">Passo a passo para depurar a API e a Aplicação Web com Hot Reload e dependências no Docker</div>
+</div>
+
+<p>Este documento apresenta o fluxo de trabalho recomendado para depuração da solução <strong>DesafioBackend</strong>. A arquitetura adotada permite rodar o código C# da <strong>API (.NET 8)</strong> e da aplicação <strong>Web MVC</strong> diretamente no compilador do Visual Studio, mantendo o <strong>PostgreSQL</strong> e o <strong>RabbitMQ</strong> em containers leves no Docker.</p>
+
+<div class="alert alert-info">
+    <strong>💡 Benefícios desta abordagem:</strong> Breakpoints instantâneos com parada imediata de threads, suporte a <strong>Hot Reload</strong> (modificar código sem reiniciar a aplicação), visualização completa de variáveis locais e Janela Imediata para testes em tempo real.
+</div>
+
+<h1>1. Passo a Passo Completo de Depuração</h1>
+
+<!-- PASSO 0 -->
+<div class="step-card">
+    <div class="step-header">
+        <span class="step-num">0</span>
+        Subir Dependências Externas no Docker (PostgreSQL & RabbitMQ)
+    </div>
+    <p>O seu código C# precisa de um banco de dados e de um broker de mensageria ativo. Abra o terminal (PowerShell ou CMD) na pasta raiz do projeto e execute:</p>
+    <pre>docker compose up -d db rabbitmq</pre>
+    <p>Esse comando inicializa:</p>
+    <ul>
+        <li><strong>PostgreSQL 16:</strong> Porta <code>5433</code> (mapeada para a 5432 interna).</li>
+        <li><strong>RabbitMQ 3:</strong> Portas <code>5672</code> (protocolo AMQP) e <code>15672</code> (painel web de gestão).</li>
+    </ul>
+</div>
+
+<!-- PASSO 1 -->
+<div class="step-card">
+    <div class="step-header">
+        <span class="step-num">1</span>
+        Abrir a Solução no Visual Studio 2022
+    </div>
+    <ol>
+        <li>Abra o <strong>Visual Studio 2022</strong>.</li>
+        <li>Clique em <strong>Abrir um projeto ou solução</strong> (<em>Open a project or solution</em>).</li>
+        <li>Navegue até a pasta do projeto e selecione o arquivo:
+            <br><code>C:\GitHub\Mottu-ops\DesafioBackend\DesafioBackend.sln</code>
+        </li>
+    </ol>
+</div>
+
+<!-- PASSO 2 -->
+<div class="step-card">
+    <div class="step-header">
+        <span class="step-num">2</span>
+        Configurar Inicialização Conjunta (API + Web)
+    </div>
+    <p>Para depurar a API e o Painel Web simultaneamente com um único clique:</p>
+    <ol>
+        <li>No painel direito, <strong>Gerenciador de Soluções</strong> (<em>Solution Explorer</em>), clique com o <strong>botão direito</strong> sobre o nó raiz: <code>Solução 'DesafioBackend'</code>.</li>
+        <li>Selecione <strong>Configurar Projetos de Inicialização...</strong> (<em>Configure Startup Projects...</em>).</li>
+        <li>Marque a opção <strong>Vários projetos de inicialização</strong> (<em>Multiple startup projects</em>):
+            <ul>
+                <li><code>DesafioBackend.Api</code> &rarr; Ação: <strong>Iniciar</strong> (<em>Start</em>)</li>
+                <li><code>DesafioBackend.Web</code> &rarr; Ação: <strong>Iniciar</strong> (<em>Start</em>)</li>
+                <li>Os demais projetos de teste e bibliotecas permanecem como <em>Nenhum (None)</em>.</li>
+            </ul>
+        </li>
+        <li>Clique no botão <strong>Aplicar</strong> e em seguida em <strong>OK</strong>.</li>
+    </ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PASSO 3 -->
+<div class="step-card">
+    <div class="step-header">
+        <span class="step-num">3</span>
+        Colocar Pontos de Interrupção (Breakpoints)
+    </div>
+    <p>O breakpoint instrui o Visual Studio a pausar o programa exatamente antes de executar uma determinada linha:</p>
+    <ol>
+        <li>No Solution Explorer, navegue e abra um arquivo de controle ou serviço:
+            <br>Exemplo 1: <code>src/DesafioBackend.Api/Controllers/MotosController.cs</code> (método <code>Cadastrar</code>)
+            <br>Exemplo 2: <code>src/DesafioBackend.Application/Services/RentalService.cs</code> (método <code>CreateAsync</code>)
+        </li>
+        <li>Clique com o botão esquerdo na <strong>margem cinza à esquerda da linha de código</strong> ou posicione o cursor na linha e aperte a tecla <span class="key-badge">F9</span>.</li>
+        <li>Uma <strong>bolinha vermelha</strong> sólida aparecerá, confirmando que o ponto de parada está armado.</li>
+    </ol>
+</div>
+
+<!-- PASSO 4 -->
+<div class="step-card success">
+    <div class="step-header">
+        <span class="step-num">4</span>
+        Iniciar a Sessão de Depuração com F5
+    </div>
+    <ol>
+        <li>Pressione a tecla <span class="key-badge">F5</span> (ou clique no botão verde com ícone de Play <strong>Iniciar</strong> na barra superior).</li>
+        <li>O Visual Studio compilará a solução e iniciará ambos os projetos:
+            <ul>
+                <li><strong>Swagger da API:</strong> <code>http://localhost:5000</code></li>
+                <li><strong>Portal Web MVC:</strong> <code>http://localhost:5001</code></li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
+<!-- PASSO 5 -->
+<div class="step-card success">
+    <div class="step-header">
+        <span class="step-num">5</span>
+        Inspecionar Valores e Navegar no Código
+    </div>
+    <p>No navegador, execute a ação correspondente (ex: cadastre uma moto via Swagger ou faça uma locação no Portal Web):</p>
+    <ul>
+        <li>O Visual Studio piscará na barra de tarefas e pausará a execução na linha destacada em <strong>amarelo</strong>.</li>
+        <li><strong>Inspecionar Valores:</strong> Passe o cursor do mouse sobre variáveis (ex: <code>request</code>, <code>model</code>, <code>placa</code>) para ver os dados em um pop-up flutuante.</li>
+        <li><strong>Janela Locais (Locals):</strong> Exibe todas as variáveis do escopo da função atual com seus respectivos tipos e valores.</li>
+        <li><strong>Janela Imediata (Immediate Window):</strong> Abra via <code>Depurar &gt; Janelas &gt; Imediata</code> para executar expressões C# em tempo de execução (ex: digitar <code>? request.Placa</code> e pressionar Enter).</li>
+    </ul>
+</div>
+
+<h1>2. Tabela de Atalhos de Teclado no Visual Studio</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th style="width:20%;">Atalho</th>
+            <th style="width:30%;">Nome do Comando</th>
+            <th>Finalidade e Comportamento</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><span class="key-badge">F5</span></td>
+            <td><strong>Continuar (Continue)</strong></td>
+            <td>Inicia a depuração ou retoma a execução livre até encontrar o próximo breakpoint.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">F10</span></td>
+            <td><strong>Passar Sobre (Step Over)</strong></td>
+            <td>Executa a linha atual e avança para a linha seguinte <strong>sem entrar</strong> dentro de outros métodos.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">F11</span></td>
+            <td><strong>Depurar Interrupção (Step Into)</strong></td>
+            <td><strong>Entra dentro</strong> do método chamado na linha atual (ex: entra no Service, Repository ou Handler).</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">Shift + F11</span></td>
+            <td><strong>Sair da Função (Step Out)</strong></td>
+            <td>Termina a execução do método atual e volta para o método que fez a chamada original.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">F9</span></td>
+            <td><strong>Alternar Breakpoint</strong></td>
+            <td>Ativa ou remove o ponto de interrupção na linha atual do editor.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">Ctrl + Shift + F9</span></td>
+            <td><strong>Limpar Breakpoints</strong></td>
+            <td>Desativa todos os breakpoints configurados na solução.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">Shift + F5</span></td>
+            <td><strong>Parar Depuração (Stop)</strong></td>
+            <td>Encerra a execução da API e da aplicação Web imediatamente.</td>
+        </tr>
+        <tr>
+            <td><span class="key-badge">Alt + F10</span></td>
+            <td><strong>Aplicar Hot Reload</strong></td>
+            <td>Aplica as alterações de código feitas no editor diretamente na aplicação em execução.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h1>3. Recursos Avançados de Produtividade</h1>
+
+<h2>Hot Reload no .NET 8</h2>
+<p>Durante a depuração no Visual Studio 2022, você não precisa interromper o processo para corrigir uma regra de negócio ou modificar uma tela HTML:</p>
+<ol>
+    <li>Faça a alteração no código C# ou no arquivo <code>.cshtml</code>.</li>
+    <li>Clique no ícone de <strong>Foguinho vermelho (Hot Reload)</strong> na barra de ferramentas superior (ou aperte <span class="key-badge">Alt + F10</span>).</li>
+    <li>A alteração entra em vigor instantaneamente sem perder a sessão atual do usuário.</li>
+</ol>
+
+<h2>Opção Alternativa: Depurar Anexando ao Processo no Docker</h2>
+<p>Se você preferir executar toda a stack dentro dos containers (via <code>docker compose up -d</code>) e anexar o depurador do Visual Studio ao container Linux em tempo de execução:</p>
+<ol>
+    <li>No menu superior do Visual Studio, vá em: <strong>Depurar (Debug) &rarr; Anexar ao Processo... (Attach to Process...)</strong> ou aperte <span class="key-badge">Ctrl + Alt + P</span>.</li>
+    <li>No campo <strong>Tipo de Conexão</strong> (<em>Connection type</em>), selecione <strong>Docker (Contêiner do Linux)</strong>.</li>
+    <li>No campo <strong>Destino da Conexão</strong>, clique em <strong>Localizar... (Find...)</strong> e selecione o container desejado:
+        <ul>
+            <li><code>desafio_backend_api</code> (para depurar a API REST)</li>
+            <li><code>desafio_backend_web</code> (para depurar a aplicação Web MVC)</li>
+        </ul>
+    </li>
+    <li>Na lista de processos que aparecerá abaixo, selecione o processo <code>dotnet</code> e clique em <strong>Anexar (Attach)</strong>.</li>
+    <li>Seus breakpoints no código C# serão vinculados e acionados quando requisições chegarem ao container.</li>
+</ol>
+
+<h1>4. Tabela de Serviços e Credenciais para Depuração Local</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Serviço</th>
+            <th>Host Local</th>
+            <th>Porta</th>
+            <th>Credenciais de Acesso</th>
+            <th>Finalidade / Detalhes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>PostgreSQL 16</strong></td>
+            <td><code>localhost</code></td>
+            <td><code>5433</code></td>
+            <td>User: <code>postgres</code><br>Pass: <code>postgrespassword</code></td>
+            <td>Database: <code>desafiodb</code><br>Connection string em <code>appsettings.json</code> da API.</td>
+        </tr>
+        <tr>
+            <td><strong>RabbitMQ (AMQP)</strong></td>
+            <td><code>localhost</code></td>
+            <td><code>5672</code></td>
+            <td>User: <code>guest</code><br>Pass: <code>guest</code></td>
+            <td>Broker de mensageria para envio assíncrono de eventos de motos e entregas.</td>
+        </tr>
+        <tr>
+            <td><strong>RabbitMQ (Web)</strong></td>
+            <td><code>localhost</code></td>
+            <td><code>15672</code></td>
+            <td>User: <code>guest</code><br>Pass: <code>guest</code></td>
+            <td>Painel interativo para monitoramento de filas e trocas de mensagens.</td>
+        </tr>
+        <tr>
+            <td><strong>API Backend</strong></td>
+            <td><code>localhost</code></td>
+            <td><code>5000</code></td>
+            <td>User: <code>admin</code><br>Pass: <code>admin</code></td>
+            <td>Documentação interativa Swagger com suporte a JWT Bearer.</td>
+        </tr>
+        <tr>
+            <td><strong>Portal Web MVC</strong></td>
+            <td><code>localhost</code></td>
+            <td><code>5001</code></td>
+            <td>User: <code>admin</code><br>Pass: <code>admin</code></td>
+            <td>Interface gráfica de gestão operacional (motos, entregadores e locações).</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<div class="alert alert-success" style="text-align: center; margin-top: 15px;">
+    <strong>Guia de Depuração Concluído</strong><br>
+    Pronto para execução e testes de qualidade no ambiente de desenvolvimento.
+</div>
+
+</body>
+</html>
+

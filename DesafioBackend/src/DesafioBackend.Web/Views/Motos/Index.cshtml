@@ -1,0 +1,108 @@
+@model IReadOnlyList<DesafioBackend.Web.Models.Motos.MotoViewModel>
+@{
+    ViewData["Title"] = "Motos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Motos</h1>
+        <p class="text-muted mb-0">Gerencie a frota de motocicletas da plataforma.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">
+            &larr; Voltar ao Painel
+        </a>
+        <a asp-action="Cadastrar" class="btn btn-primary">
+            + Cadastrar Moto
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <label for="placa" class="col-form-label fw-bold">Filtrar por Placa:</label>
+            </div>
+            <div class="col-auto">
+                <input type="text" id="placa" name="placa" value="@ViewBag.FiltroPlaca" class="form-control" placeholder="Ex: ABC-1234" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+                @if (!string.IsNullOrWhiteSpace((string)ViewBag.FiltroPlaca))
+                {
+                    <a asp-action="Index" class="btn btn-link text-decoration-none">Limpar</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Identificador</th>
+                    <th>Modelo</th>
+                    <th>Ano</th>
+                    <th>Placa</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            Nenhuma moto encontrada.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var moto in Model)
+                    {
+                        <tr>
+                            <td><strong>@moto.Identificador</strong></td>
+                            <td>@moto.Modelo</td>
+                            <td>
+                                <span class="badge @(moto.Ano == 2024 ? "bg-warning text-dark" : "bg-secondary")">
+                                    @moto.Ano @(moto.Ano == 2024 ? "(Notificada)" : "")
+                                </span>
+                            </td>
+                            <td><code>@moto.Placa</code></td>
+                            <td class="text-end">
+                                <a asp-action="EditarPlaca" asp-route-id="@moto.Identificador" class="btn btn-sm btn-outline-secondary me-1">
+                                    Editar Placa
+                                </a>
+                                <form asp-action="Excluir" asp-route-id="@moto.Identificador" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover esta moto?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Excluir
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

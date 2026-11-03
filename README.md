@@ -1,76 +1,146 @@
-# Desafio backend Mottu.
-Seja muito bem-vindo ao desafio backend da Mottu, obrigado pelo interesse em fazer parte do nosso time e ajudar a melhorar a vida de milhares de pessoas.
+# Desafio Backend - Sistema de Manutenção de Motos e Locação
 
-## Instruções
-- O desafio é válido para diversos níveis, portanto não se preocupe se não conseguir resolver por completo.
-- A aplicação só será avaliada se estiver rodando, se necessário crie um passo a passo para isso.
-- Faça um clone do repositório em seu git pessoal para iniciar o desenvolvimento e não cite nada relacionado a Mottu.
-- Após teste realizado, favor encaminha-lo via Link abaixo:
-Link: [Formulário - Mottu - Desafio Backend](https://forms.office.com/r/25yMPCax5S)
+Aplicação desenvolvida em **.NET 8** utilizando arquitetura **Domain-Driven Design (DDD)** e **Clean Architecture**, seguindo rigorosamente a especificação do Swagger do desafio técnico.
 
-## Requisitos não funcionais 
-- A aplicação deverá ser construida com .Net utilizando C#.
-- Utilizar apenas os seguintes bancos de dados (Postgress, MongoDB)
-    - Não utilizar PL/pgSQL
-- Escolha o sistema de mensageria de sua preferencia( RabbitMq, Sqs/Sns , Kafka, Gooogle Pub/Sub ou qualquer outro)
+---
 
-## Aplicação a ser desenvolvida
-Seu objetivo é criar uma aplicação para gerenciar aluguel de motos e entregadores. Quando um entregador estiver registrado e com uma locação ativa poderá também efetuar entregas de pedidos disponíveis na plataforma.
+## 🛠️ Tecnologias Utilizadas
 
-Iremos executar um teste de integração para validar os cenários de uso. Por isso, sua aplicação deve seguir exatamente as especificações de API`s Rest do nosso Swager: request, response e status code.
-Garanta que os atributos dos JSON`s e estão de acordo com o Swagger abaixo.
+- **.NET 8 (C#)**
+- **Entity Framework Core 8** com **PostgreSQL** (Npgsql)
+- **MassTransit & RabbitMQ** para mensageria assíncrona orientada a eventos
+- **Docker & Docker Compose** para orquestração de containers
+- **xUnit & Moq** para testes unitários e de integração
+- **Swagger / OpenAPI** com documentação interativa
 
-Swagger de referência:
-https://app.swaggerhub.com/apis-docs/Mottu/mottu_desafio_backend/1.0.0
+---
 
-### Casos de uso
-- Eu como usuário admin quero cadastrar uma nova moto.
-  - Os dados obrigatórios da moto são Identificador, Ano, Modelo e Placa
-  - A placa é um dado único e não pode se repetir.
-  - Quando a moto for cadastrada a aplicação deverá gerar um evento de moto cadastrada
-    - A notificação deverá ser publicada por mensageria.
-    - Criar um consumidor para notificar quando o ano da moto for "2024"
-    - Assim que a mensagem for recebida, deverá ser armazenada no banco de dados para consulta futura.
-- Eu como usuário admin quero consultar as motos existentes na plataforma e conseguir filtrar pela placa.
-- Eu como usuário admin quero modificar uma moto alterando apenas sua placa que foi cadastrado indevidamente
-- Eu como usuário admin quero remover uma moto que foi cadastrado incorretamente, desde que não tenha registro de locações.
-- Eu como usuário entregador quero me cadastrar na plataforma para alugar motos.
-    - Os dados do entregador são( identificador, nome, cnpj, data de nascimento, número da CNHh, tipo da CNH, imagemCNH)
-    - Os tipos de cnh válidos são A, B ou ambas A+B.
-    - O cnpj é único e não pode se repetir.
-    - O número da CNH é único e não pode se repetir.
-- Eu como entregador quero enviar a foto de minha cnh para atualizar meu cadastro.
-    - O formato do arquivo deve ser png ou bmp.
-    - A foto não poderá ser armazenada no banco de dados, você pode utilizar um serviço de storage( disco local, amazon s3, minIO ou outros).
-- Eu como entregador quero alugar uma moto por um período.
-    - Os planos disponíveis para locação são:
-        - 7 dias com um custo de R$30,00 por dia
-        - 15 dias com um custo de R$28,00 por dia
-        - 30 dias com um custo de R$22,00 por dia
-        - 45 dias com um custo de R$20,00 por dia
-        - 50 dias com um custo de R$18,00 por dia
-    - A locação obrigatóriamente tem que ter uma data de inicio e uma data de término e outra data de previsão de término.
-    - O inicio da locação obrigatóriamente é o primeiro dia após a data de criação.
-    - Somente entregadores habilitados na categoria A podem efetuar uma locação
-- Eu como entregador quero informar a data que irei devolver a moto e consultar o valor total da locação.
-    - Quando a data informada for inferior a data prevista do término, será cobrado o valor das diárias e uma multa adicional
-        - Para plano de 7 dias o valor da multa é de 20% sobre o valor das diárias não efetivadas.
-        - Para plano de 15 dias o valor da multa é de 40% sobre o valor das diárias não efetivadas.
-    - Quando a data informada for superior a data prevista do término, será cobrado um valor adicional de R$50,00 por diária adicional.
-    
+## 🏛️ Arquitetura do Projeto (DDD)
 
-## Diferenciais 🚀
-- Testes unitários
-- Testes de integração
-- EntityFramework e/ou Dapper
-- Docker e Docker Compose
-- Design Patterns
-- Documentação
-- Tratamento de erros
-- Arquitetura e modelagem de dados
-- Código escrito em língua inglesa
-- Código limpo e organizado
-- Logs bem estruturados
-- Seguir convenções utilizadas pela comunidade
-  
+A solução está estruturada em camadas bem definidas e desacopladas:
+
+```text
+DesafioBackend/
+├── src/
+│   ├── DesafioBackend.Domain/              # Regras de negócio puras, entidades, VOs, eventos e interfaces
+│   │   ├── Common/                         # BaseEntity, IAggregateRoot, IDomainEvent, ValueObject
+│   │   ├── Entities/                       # Motorcycle, DeliveryDriver, Rental, MotorcycleNotification
+│   │   ├── Enums/                          # DriverLicenseType (A, B, AB), RentalPlanType (7, 15, 30, 45, 50)
+│   │   ├── Events/                         # MotorcycleRegisteredEvent
+│   │   ├── Exceptions/                     # DomainException
+│   │   └── Repositories/                   # Interfaces dos repositórios e Unit of Work
+│   │
+│   ├── DesafioBackend.Application/         # Casos de uso, orquestração e DTOs
+│   │   ├── Common/                         # Interfaces de Storage, Mensageria e Exceções
+│   │   ├── DTOs/                           # Requests e Responses conforme contrato Swagger
+│   │   └── Services/                       # MotorcycleService, DeliveryDriverService, RentalService
+│   │
+│   ├── DesafioBackend.Infrastructure/      # Persistência, Mensageria e Armazenamento
+│   │   ├── Persistence/                    # AppDbContext, Mapeamentos EF Core, Repositórios
+│   │   ├── Messaging/                      # MassTransit com RabbitMQ e Consumers
+│   │   └── Storage/                        # LocalStorageService (armazenamento de arquivos de CNH)
+│   │
+│   ├── DesafioBackend.Web/                 # Interface Web Administrativa (ASP.NET Core MVC)
+│   │   ├── Controllers/                    # AdminController, AuthController, HomeController
+│   │   ├── Services/                       # ApiClient, AuthService, JwtTokenHandler
+│   │   ├── Views/                          # Dashboards e telas de login/gestão
+│   │   └── Dockerfile                      # Containerização da aplicação Web
+│   │
+│   └── DesafioBackend.Api/                 # Entrada HTTP (REST API)
+│       ├── Controllers/                    # MotosController, EntregadoresController, LocacaoController, AuthController, EntregasController
+│       ├── Middlewares/                    # GlobalExceptionMiddleware (respostas de erro padronizadas)
+│       └── Dockerfile                      # Build multi-stage otimizado
+│
+└── tests/
+    ├── DesafioBackend.UnitTests/           # Testes unitários de domínio e serviços
+    └── DesafioBackend.IntegrationTests/    # Testes de integração de endpoints
+```
+
+---
+
+## 🚀 Como Executar
+
+### 1. Com Docker Compose (Recomendado)
+
+Certifique-se de que o Docker está instalado e em execução. Na raiz do repositório, execute:
+
+```bash
+docker compose up -d --build
+```
+
+Os serviços inicializarão automaticamente:
+- **PostgreSQL**: porta host `5433` (container `5432`)
+- **RabbitMQ**: portas `5672` (mensagens) e `15672` (painel gerencial web)
+- **API**: porta `5000` (http://localhost:5000)
+- **Web (Painel Administrativo)**: porta `5001` (http://localhost:5001)
+
+As migrações do banco de dados são aplicadas **automaticamente** na inicialização da API.
+
+Acesse as aplicações em:
+👉 **Swagger da API:** [http://localhost:5000](http://localhost:5000)  
+👉 **Painel Administrativo Web:** [http://localhost:5001](http://localhost:5001) *(login padrão: usuário `admin`, senha `admin`)*  
+👉 **Painel RabbitMQ:** [http://localhost:15672](http://localhost:15672) *(usuário: `guest`, senha: `guest`)*
+
+> 💡 **Guia Completo de Credenciais e Depuração no Visual Studio**: Consulte o arquivo [`SERVICOS_E_DEBUG.md`](./SERVICOS_E_DEBUG.md) para detalhes completos de portas, connection strings, usuários, senhas e passo a passo para depurar com F5 ou anexar ao Docker.
+
+Para parar os serviços:
+```bash
+docker compose down
+```
+
+---
+
+### 2. Execução Local (.NET CLI)
+
+1. Inicie as dependências externas (PostgreSQL e RabbitMQ):
+```bash
+docker compose up -d db rabbitmq
+```
+
+2. Execute as migrações e inicie a API:
+```bash
+dotnet run --project src/DesafioBackend.Api
+```
+
+---
+
+## 🧪 Executando os Testes
+
+Execute a suíte completa de testes unitários e de integração com:
+
+```bash
+dotnet test DesafioBackend.sln
+```
+
+---
+
+## 📋 Funcionalidades Implementadas
+
+### Motos (`/motos`)
+- `POST /motos`: Cadastro de nova moto com validação de placa única.
+  - Publicação de evento de mensageria via RabbitMQ.
+  - Consumidor dedicado que detecta motos do ano `2024` e grava notificação no banco de dados.
+- `GET /motos`: Consulta de motos cadastradas com filtro opcional por placa (`?placa=XYZ`).
+- `GET /motos/{id}`: Consulta detalhada de moto por identificador.
+- `PUT /motos/{id}/placa`: Atualização da placa da moto (com validação de duplicidade).
+- `DELETE /motos/{id}`: Remoção de motos incorretas (bloqueado caso possua locações registradas).
+
+### Entregadores (`/entregadores`)
+- `POST /entregadores`: Cadastro de entregador com CNPJ único, CNH única e categorias válidas (`A`, `B`, `A+B`).
+- `POST /entregadores/{id}/cnh`: Upload da foto da CNH nos formatos `PNG` ou `BMP` salvos em serviço de storage desacoplado (não armazenado no banco).
+
+### Locação (`/locacao`)
+- `POST /locacao`: Criação de locação de moto para entregador.
+  - Validação de que a data de início deve ser o primeiro dia após a data de criação.
+  - Validação de que apenas entregadores com habilitação categoria `A` ou `A+B` podem alugar motos.
+  - Planos disponíveis:
+    - 7 dias (R$ 30,00/dia)
+    - 15 dias (R$ 28,00/dia)
+    - 30 dias (R$ 22,00/dia)
+    - 45 dias (R$ 20,00/dia)
+    - 50 dias (R$ 18,00/dia)
+- `GET /locacao/{id}`: Consulta dos detalhes da locação por identificador.
+- `PUT /locacao/{id}/devolucao`: Informa a data de devolução e calcula o valor final da locação:
+  - Devolução antecipada: aplica multa de 20% (plano 7 dias) ou 40% (plano 15 dias) sobre as diárias não efetivadas.
+  - Devolução tardia: aplica acréscimo de R$ 50,00 por diária adicional.
 
